@@ -1,11 +1,12 @@
 var currentPullRequests = [];
 
 function getData(){
-	chrome.storage.sync.get("url", function (obj) {
-		if(obj.url !== undefined){
+	chrome.storage.sync.get("data", function (obj) {
+		console.log(obj);
+		if(obj.data.org !== undefined && obj.data.repo !== undefined){
 		    var request = new XMLHttpRequest();
 
-			request.open('GET', obj.url, true);
+			request.open('GET', 'http://github.com/' + obj.data.org + '/' + obj.data.repo + '/pulls', true);
 
 			request.onload = function() {
 			  if (this.status >= 200 && this.status < 400) {
@@ -30,7 +31,7 @@ function parseData(resp){
 		            type:"basic",
 		            title:"New pull request raised!",
 		            message: div.text.trim(),
-		            iconUrl:"../icons/github.png"
+		            iconUrl:"../icons/512.png"
 		        }, function() { } 
 		    );
 		}
