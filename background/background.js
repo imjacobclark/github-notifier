@@ -2,7 +2,6 @@ var currentPullRequests = [];
 
 function getData(){
 	chrome.storage.sync.get("data", function (obj) {
-		console.log(obj);
 		if(obj.data.org !== undefined && obj.data.repo !== undefined){
 		    var request = new XMLHttpRequest();
 
@@ -24,19 +23,30 @@ function parseData(resp){
     container.innerHTML = resp;
     var nodeList = container.querySelectorAll('.table-list-issues .js-issue-row .issue-title-link');
 
-	[].forEach.call(nodeList, function(div) {
-		if(currentPullRequests.indexOf(div.text.trim()) === -1){
-			chrome.notifications.create(
-		        div.text.trim(),{   
-		            type:"basic",
-		            title:"New pull request raised!",
-		            message: div.text.trim(),
-		            iconUrl:"../icons/512.png"
-		        }, function() { } 
-		    );
+   	[].forEach.call(nodeList, function(div, i) {
+		currentPullRequests.length = 1;
+		if(currentPullRequests.length !== 0){
+
+			if(currentPullRequests.indexOf(div.text.trim()) === -1){
+				chrome.storage.sync.get("data", function (obj) {
+					chrome.notifications.create(
+				        i,{   
+				            type:"basic",
+				            title:obj.data.org + '/' + obj.data.repo,
+				            message: div.text.trim(),
+				            iconUrl:"../icons/512.png"
+				        }, function() { } 
+				    );
+				});
+			};
+
+			currentPullRequests.push(div.text.trim());
 		}
-		currentPullRequests.push(div.text.trim());
 	});
+
+	chrome.notifications.onClicked.addListener(function(id){
+    	alert(id);
+    });
 }
 
 getData();
