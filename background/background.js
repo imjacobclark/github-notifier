@@ -1,16 +1,21 @@
 var currentPullRequests = [];
 
 function getData(){
-	var request = new XMLHttpRequest();
-	request.open('GET', 'https://github.com/nodejs/node/pulls', true);
+	chrome.storage.sync.get("url", function (obj) {
+		if(obj.url !== undefined){
+		    var request = new XMLHttpRequest();
 
-	request.onload = function() {
-	  if (this.status >= 200 && this.status < 400) {
-	  	parseData(this.response);
-	  }
-	};
+			request.open('GET', obj.url, true);
 
-	request.send();
+			request.onload = function() {
+			  if (this.status >= 200 && this.status < 400) {
+			  	parseData(this.response);
+			  }
+			};
+
+			request.send();
+		};
+	});
 }
 
 function parseData(resp){
@@ -20,19 +25,16 @@ function parseData(resp){
 
 	[].forEach.call(nodeList, function(div) {
 		if(currentPullRequests.indexOf(div.text.trim()) === -1){
-			console.log("Hc")
 			chrome.notifications.create(
 		        div.text.trim(),{   
 		            type:"basic",
 		            title:"New pull request raised!",
 		            message: div.text.trim(),
-		            iconUrl:"github.png"
+		            iconUrl:"../icons/github.png"
 		        }, function() { } 
 		    );
 		}
-
 		currentPullRequests.push(div.text.trim());
-    	
 	});
 }
 
