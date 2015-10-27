@@ -1,17 +1,63 @@
 <html>
 	<head>
 		<title>GitHub Pull Request notifier for Chrome</title>
+
+		<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+		<script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+		<style>
+			.demo-card-square.mdl-card {
+				width: 320px;
+				background: #f2ff;
+			}
+
+			.demo-card-square > .mdl-card__title {
+			  color: #fff;
+			  height: 170px;
+			  background: url('https://enterprise.github.com/assets/aws/jetpack-octocat-airlock-b1d6ad7f41f88e5207896fe1f63ca30b.jpg') center / cover;
+			}
+
+			.demo-card-square > .mdl-card__menu {
+			  color: #fff;
+			}
+
+			.add-project__forms{
+
+			}
+		</style>
 	</head>
 	<body>
-		<div style="width:400px; height: 170px;">
-			<h1>GitHub Pull Request notifier for Chrome</h1>
-			<p>Add a project to recieve notifications!</p>
-			<input type="text" placeholder="Organisation" class="org"> <input type="text" placeholder="Repo" class="repo"><input type="submit" class="" value="Add" id="addProject">
-			<p>We currently only support one project</p>
-			<p><a href="https://github.com/imjacobclark/github-pull-request-notifier-for-chrome">Fork me on GitHub</a></p>
+		<div class="demo-card-square mdl-card mdl-shadow--2d">
+			<div class="mdl-card__title">
+				<h2 class="mdl-card__title-text">GitHub Pull Request notifier for Chrome</h2>
+			</div>
+
+			<div class="mdl-card__supporting-text">
+				<p class="add-project__new-user">Hello, add a few projects to get started!</p>
+				<p class="add-project__been-here-before">Welcome back! Add a few more projects...</p>
+
+				<div class="add-project__forms">
+
+				</div>
+
+				<br/>
+
+				<button class="add-project__watch-new-bttn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+				  Watch new project
+				</button>
+
+				<button class="add-project__save-bttn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+				  Save
+				</button>
+
+				<br/><br/>
+
+				<p><a href="https://github.com/imjacobclark/github-pull-request-notifier-for-chrome" target="_blank">Fork me on GitHub</a></p>
+
+			</div>
 		</div>
 
 		<script type="text/javascript" src="options.js"></script>
 	</body>
 </html>
-

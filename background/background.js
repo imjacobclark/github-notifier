@@ -2,23 +2,25 @@ var currentPullRequests = [];
 
 function getData(){
 	chrome.storage.sync.get("data", function (obj) {
-		if(obj.data.org !== undefined && obj.data.repo !== undefined){
-		    var request = new XMLHttpRequest();
+		obj.data.forEach(function(project){
+			if(project.org !== undefined && project.repo !== undefined){
+			    var request = new XMLHttpRequest();
 
-			request.open('GET', 'http://github.com/' + obj.data.org + '/' + obj.data.repo + '/pulls', true);
+				request.open('GET', 'http://github.com/' + project.org + '/' + project.repo + '/pulls', true);
 
-			request.onload = function() {
-			  if (this.status >= 200 && this.status < 400) {
-			  	parseData(this.response);
-			  }
+				request.onload = function() {
+				  if (this.status >= 200 && this.status < 400) {
+				  	parseData(this.response, project.org, project.repo);
+				  }
+				};
+
+				request.send();
 			};
-
-			request.send();
-		};
+		})
 	});
 }
 
-function parseData(resp){
+function parseData(resp, org, repo){
     var container = document.implementation.createHTMLDocument().documentElement;
     container.innerHTML = resp;
     var nodeList = container.querySelectorAll('.table-list-issues .js-issue-row .issue-title-link');
@@ -30,12 +32,17 @@ function parseData(resp){
 			if(currentPullRequests.indexOf(div.text.trim()) === -1){
 				chrome.storage.sync.get("data", function (obj) {
 					chrome.notifications.create(
-				        i,{   
+				        org + ':' + repo  + ':' + div.text.trim(),{
 				            type:"basic",
-				            title:obj.data.org + '/' + obj.data.repo,
+				            title:org + '/' + repo,
 				            message: div.text.trim(),
-				            iconUrl:"../icons/512.png"
-				        }, function() { } 
+				            iconUrl:"../icons/512.png",
+							buttons: [
+								{
+					            	title: "View open pull requests"
+					        	}
+							]
+				        }, function() { }
 				    );
 				});
 			};
@@ -44,13 +51,19 @@ function parseData(resp){
 		}
 	});
 
-	chrome.notifications.onClicked.addListener(function(id){
-    	alert(id);
-    });
+	chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
+		var notificatoinInformation = notifId.split(':');
+
+		chrome.tabs.create(
+			{
+				url: 'http://github.com/' + notificatoinInformation[0] + '/' + notificatoinInformation[1] + '/pulls'
+			}
+		);
+	});
 }
 
 getData();
 
-setInterval(function(){ 
+setInterval(function(){
     getData();
 }, 5000);
