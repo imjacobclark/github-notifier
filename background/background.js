@@ -30,35 +30,19 @@ function parseData(resp, org, repo){
 		if(currentPullRequests.length !== 0){
 
 			if(currentPullRequests.indexOf(div.text.trim()) === -1){
-				chrome.storage.sync.get("data", function (obj) {
-					chrome.notifications.create(
-				        org + ':' + repo  + ':' + div.text.trim(),{
-				            type:"basic",
-				            title:org + '/' + repo,
-				            message: div.text.trim(),
-				            iconUrl:"../icons/512.png",
-							buttons: [
-								{
-					            	title: "View open pull requests"
-					        	}
-							]
-				        }, function() { }
-				    );
-				});
+				chrome.notifications.create(
+			        org + ':' + repo  + ':' + div.text.trim(),{
+			            type:"basic",
+			            title:org + '/' + repo,
+			            message: div.text.trim(),
+			            iconUrl:"../icons/512.png"
+			        }, function() {
+					}
+			    );
 			};
 
 			currentPullRequests.push(div.text.trim());
 		}
-	});
-
-	chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
-		var notificatoinInformation = notifId.split(':');
-
-		chrome.tabs.create(
-			{
-				url: 'http://github.com/' + notificatoinInformation[0] + '/' + notificatoinInformation[1] + '/pulls'
-			}
-		);
 	});
 }
 
