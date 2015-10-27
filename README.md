@@ -2,4 +2,4 @@
 
 Chrome extension to show a notification when a new GitHub pull request is raised on chosen repositories.
 
-Not ready for production use yet, nor is this on the Chrome Web Store, feel free to contribute. 
+https://chrome.google.com/webstore/detail/github-pull-request-notif/ekjiicgclcmjodoijejldoohdlomjlhl
