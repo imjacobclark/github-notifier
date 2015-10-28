@@ -1,53 +1,58 @@
-var currentPullRequests = [];
+var GitHubPullRequestNotifier = function(){
+	this.currentPullRequests = [];
+}
 
-function getData(){
+GitHubPullRequestNotifier.prototype.getData = function(){
 	chrome.storage.sync.get("data", function (obj) {
 		obj.data.forEach(function(project){
 			if(project.org !== undefined && project.repo !== undefined){
-			    var request = new XMLHttpRequest();
+			  var request = new XMLHttpRequest();
 
 				request.open('GET', 'http://github.com/' + project.org + '/' + project.repo + '/pulls', true);
 
-				request.onload = function() {
+				var _this = this;
+
+				data = request.onload = function() {
 				  if (this.status >= 200 && this.status < 400) {
-				  	parseData(this.response, project.org, project.repo);
+				  	_this.parseData(this.response, project.org, project.repo);
 				  }
 				};
 
 				request.send();
 			};
-		})
-	});
+		}.bind(this))
+	}.bind(this));
 }
 
-function parseData(resp, org, repo){
-    var container = document.implementation.createHTMLDocument().documentElement;
-    container.innerHTML = resp;
-    var nodeList = container.querySelectorAll('.table-list-issues .js-issue-row .issue-title-link');
+GitHubPullRequestNotifier.prototype.parseData = function(resp, org, repo){
+  var container = document.implementation.createHTMLDocument().documentElement;
+  container.innerHTML = resp;
+  var nodeList = container.querySelectorAll('.table-list-issues .js-issue-row .issue-title-link');
 
-   	[].forEach.call(nodeList, function(div, i) {
-		currentPullRequests.length = 1;
-		if(currentPullRequests.length !== 0){
-
-			if(currentPullRequests.indexOf(div.text.trim()) === -1){
-				chrome.notifications.create(
-			        org + ':' + repo  + ':' + div.text.trim(),{
-			            type:"basic",
-			            title:org + '/' + repo,
-			            message: div.text.trim(),
-			            iconUrl:"../icons/512.png"
-			        }, function() {
-					}
-			    );
+ 	[].forEach.call(nodeList, function(div, i) {
+		if(this.currentPullRequests.length === 0){
+			this.currentPullRequests.length = 1;
+		}else{
+			if(this.currentPullRequests.indexOf(div.text.trim()) === -1){
+				chrome.notifications.create(div.text.trim(),
+				{
+						type:"basic",
+						title:org + '/' + repo,
+						message: div.text.trim(),
+						iconUrl:"../icons/512.png"
+						}, function() {}
+				);
 			};
 
-			currentPullRequests.push(div.text.trim());
+			this.currentPullRequests.push(div.text.trim());
 		}
-	});
+	}.bind(this));
 }
 
-getData();
+var ghprn = new GitHubPullRequestNotifier();
+
+ghprn.getData();
 
 setInterval(function(){
-    getData();
+    ghprn.getData();
 }, 5000);
