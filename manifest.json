@@ -4,7 +4,7 @@
   "name": "GitHub Pull Request notifier for Chrome",
   "description": "Chrome extension to show a notification when a new GitHub pull request is raised on chosen repositories.",
   "author": "Jacob Clark",
-  "version": "1.1",
+  "version": "1.3",
   "short_name": "GitHub Pull Request Notifier",
   "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png", "256": "icons/256.png", "512": "icons/512.png" },
 
