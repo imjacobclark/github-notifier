@@ -44,7 +44,6 @@ document.querySelector(".add-project__save-bttn").addEventListener("click", func
 	e.preventDefault();
 });
 
-
 document.querySelector('.add-project__watch-new-bttn').addEventListener("click", function(e){
 	saveProjects();
 
@@ -58,6 +57,5 @@ document.querySelector('.add-project__watch-new-bttn').addEventListener("click",
 
 	e.preventDefault();
 });
-
 
 populateProjectList();

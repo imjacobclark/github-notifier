@@ -1,8 +1,8 @@
-var GitHubPullRequestNotifier = function(){
+var GitHubNotifier = function(){
 	this.currentPullRequests = [];
 }
 
-GitHubPullRequestNotifier.prototype.getData = function(){
+GitHubNotifier.prototype.getData = function(){
 	chrome.storage.sync.get("data", function (obj) {
 		obj.data.forEach(function(project){
 			if(project.org !== undefined && project.repo !== undefined){
@@ -24,7 +24,7 @@ GitHubPullRequestNotifier.prototype.getData = function(){
 	}.bind(this));
 }
 
-GitHubPullRequestNotifier.prototype.parseData = function(resp, org, repo){
+GitHubNotifier.prototype.parseData = function(resp, org, repo){
   var container = document.implementation.createHTMLDocument().documentElement;
   container.innerHTML = resp;
   var nodeList = container.querySelectorAll('.table-list-issues .js-issue-row .issue-title-link');
@@ -49,7 +49,7 @@ GitHubPullRequestNotifier.prototype.parseData = function(resp, org, repo){
 	}.bind(this));
 }
 
-var ghprn = new GitHubPullRequestNotifier();
+var ghprn = new GitHubNotifier();
 
 ghprn.getData();
 
