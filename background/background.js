@@ -66,11 +66,5 @@ var ghprn = new GitHubNotifier();
 ghprn.getData(true);
 
 setInterval(function(){
-	chrome.notifications.getAll(function(data){
-		for(var key in data) {
-			chrome.notifications.clear(key);
-		}
-	});
-
     ghprn.getData(false);
 }, 5000);
