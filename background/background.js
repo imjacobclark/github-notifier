@@ -3,13 +3,21 @@ var GitHubNotifier = function(){
 }
 
 chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
-	var notificationInformation = notifId.split(':');
+	if(notifId === 'notloggedin'){
+		chrome.tabs.create(
+			{
+				url: 'https://github.com/login'
+			}
+		);
+	}else{
+		var notificationInformation = notifId.split(':');
 
-	chrome.tabs.create(
-		{
-			url: 'http://github.com/' + notificationInformation[0] + '/' + notificationInformation[1] + '/pulls'
-		}
-	);
+		chrome.tabs.create(
+			{
+				url: 'http://github.com/' + notificationInformation[3]
+			}
+		);
+	}
 });
 
 GitHubNotifier.prototype.getData = function(initialRun){
@@ -25,7 +33,21 @@ GitHubNotifier.prototype.getData = function(initialRun){
 				data = request.onload = function() {
 				  if (this.status >= 200 && this.status < 400) {
 				  	_this.parseData(this.response, project.org, project.repo, initialRun);
-				  }
+				}else{
+					chrome.notifications.create('notloggedin',
+					{
+						type:"basic",
+						title:'GitHub Notifier - Error',
+						message: "You don't appear signed into GitHub! \n\n",
+						iconUrl:"../icons/512.png",
+						buttons: [
+							{
+				            	title: "Sign in"
+				        	}
+						]
+						}, function() {}
+					);
+				}
 				};
 
 				request.send();
@@ -41,7 +63,7 @@ GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun){
  	[].forEach.call(nodeList, function(div, i) {
 		if(this.currentPullRequests.indexOf(div.text.trim()) === -1){
 			if(!initialRun){
-				chrome.notifications.create(org + ':' + repo  + ':' + div.text.trim(),
+				chrome.notifications.create(org + ':' + repo  + ':' + div.text.trim() + ':' + div.attributes['href'].nodeValue,
 				{
 						type:"basic",
 						title:org + '/' + repo,
@@ -49,7 +71,7 @@ GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun){
 						iconUrl:"../icons/512.png",
 						buttons: [
 							{
-				            	title: "View open pull requests"
+				            	title: "View pull request"
 				        	}
 						]
 						}, function() {}
