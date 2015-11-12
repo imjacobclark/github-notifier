@@ -56,7 +56,9 @@ chrome.notifications.onButtonClicked.addListener(function(notifId, btnIdx) {
 GitHubNotifier.prototype.getData = function(initialRun){
 	chrome.storage.sync.get("data", (obj) => {
 		obj.data.forEach((project) => {
-			if(this.warmRepositories.indexOf(project.org + ":" + project.repo) !== -1){
+			var isCold = this.warmRepositories.indexOf(project.org + ":" + project.repo) === -1;
+
+			if(isCold){
 				initialRun = true;
 			}
 
@@ -67,7 +69,6 @@ GitHubNotifier.prototype.getData = function(initialRun){
 				}).then((data) => {
 					this.parseData(data, project.org, project.repo, initialRun, 'issue');
 				}).catch((e) => {
-					console.log(e)
 					displayNotification(
 						'notloggedin',
 						'GitHub Notifier - Error',
@@ -77,7 +78,9 @@ GitHubNotifier.prototype.getData = function(initialRun){
 				});
 			};
 
-			this.warmRepositories.push(project.org + ":" + project.repo);
+			if(isCold){
+				this.warmRepositories.push(project.org + ":" + project.repo);
+			}
 		})
 	});
 }
@@ -101,16 +104,16 @@ GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun, type)
 			break;
 	};
 
-	var nodeList = container.querySelectorAll(selectors);
+	var notificationNodeList = container.querySelectorAll(selectors);
 	var notificationMetadataNodeList = container.querySelectorAll('.table-list-issues .js-issue-row  .tooltipped-s');
 
-	[].forEach.call(nodeList, (notification, i) => {
+	[].forEach.call(notificationNodeList, (notification, i) => {
 			if(this.currentNotifications.indexOf(notification.text.trim()) === -1){
 				if(!initialRun){
 					var notificationTitle = notification.text.trim(),
 						notificationLink = notification.attributes['href'].value,
 						notificationAuthor = notificationMetadataNodeList[i].text.trim();
-						console.log(notificationAuthor);
+
 					displayNotification(
 						org + ':' + repo  + ':' + notificationTitle.replace(':', '') + ':' + notificationLink,
 						org + '/' + repo + " - " + type,
