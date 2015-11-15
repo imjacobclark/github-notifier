@@ -68,6 +68,9 @@ GitHubNotifier.prototype.getData = function(initialRun){
 					return XHRGetRequest('http://github.com/' + project.org + '/' + project.repo + '/issues');
 				}).then((data) => {
 					this.parseData(data, project.org, project.repo, initialRun, 'issue');
+					return XHRGetRequest('http://github.com/' + project.org + '/' + project.repo + '/releases');
+				}).then((data) => {
+					this.parseData(data, project.org, project.repo, initialRun, 'release');
 				}).catch((e) => {
 					displayNotification(
 						'notloggedin',
@@ -98,6 +101,10 @@ GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun, type)
 			var selectors = '.table-list-issues .js-issue-row .issue-title-link',
 				type = 'issue'
 			break;
+		case 'release':
+			var selectors = '.release-timeline .release-header .release-title a',
+				type = 'release'
+			break;
 		default:
 			var selectors = '.table-list-issues .js-issue-row .issue-title-link',
 			type = 'pull request'
@@ -106,18 +113,25 @@ GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun, type)
 
 	var notificationNodeList = container.querySelectorAll(selectors);
 	var notificationMetadataNodeList = container.querySelectorAll('.table-list-issues .js-issue-row  .tooltipped-s');
+	var notificationReleaseMetadataNodeList = container.querySelectorAll('.release-timeline .release-authorship a');
 
 	[].forEach.call(notificationNodeList, (notification, i) => {
 			if(this.currentNotifications.indexOf(notification.text.trim()) === -1){
 				if(!initialRun){
-					var notificationTitle = notification.text.trim(),
-						notificationLink = notification.attributes['href'].value,
-						notificationAuthor = notificationMetadataNodeList[i].text.trim();
+					if(type !== 'release'){
+						var notificationAuthor = notificationMetadataNodeList[i].text.trim();
+					}else{
+						var notificationAuthor = notificationReleaseMetadataNodeList[i].text.trim();
+					}
+
+					var notificationTitle = notification.text.trim();
+					var notificationLink = notification.attributes['href'].value;
+					var message = notificationTitle + '\n\nAuthor: ' + notificationAuthor;
 
 					displayNotification(
 						org + ':' + repo  + ':' + notificationTitle.replace(':', '') + ':' + notificationLink,
 						org + '/' + repo + " - " + type,
-						notificationTitle + '\n\nAuthor: ' + notificationAuthor,
+						message,
 						[{ title: "View " + type }]
 					);
 				}
