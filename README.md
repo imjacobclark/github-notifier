@@ -15,4 +15,4 @@ https://chrome.google.com/webstore/detail/github-notifier/ekjiicgclcmjodoijejldo
 - No requirement for API/Secret Tokens
 - Open Source under MIT licence
 
-Under the hood, this application simply polls GitHub web endpoints (/pulls) of projects you specify, it doesn't require OAuth tokens or credentials entering into the extension. Open source under the MIT licence: https://github.com/imjacobclark/github-notifier
+Under the hood, this application simply polls GitHub web endpoints (/pulls|/issues|/releases) of projects you specify, it doesn't require OAuth tokens or credentials entering into the extension. Open source under the MIT licence: https://github.com/imjacobclark/github-notifier
