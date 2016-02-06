@@ -14,11 +14,13 @@ function populateProjectList(){
         projectForms.innerHTML = "";
 
         obj.data.forEach(function(project){
-            projectForms.insertAdjacentHTML("beforeend", '\
-                <div class="add-project__form">\
-                <input type="text" value="' + project.org + '" placeholder="Organisation/User" class="org">\
-                <input type="text" value="' + project.repo + '" placeholder="Repo" class="repo">\
-            </div>');
+            if(project.org !== "" || project.repo !== ""){
+                projectForms.insertAdjacentHTML("beforeend", '\
+                    <div class="add-project__form">\
+                    <input type="text" value="' + project.org + '" placeholder="Organisation/User" class="org">\
+                    <input type="text" value="' + project.repo + '" placeholder="Repo" class="repo">\
+                </div>');
+            }
         });
     });
 }
@@ -28,10 +30,12 @@ function saveProjects(){
         projectStorageArr = [];
 
     for(let i = 0; i < projects.length; i++){
-        projectStorageArr.push({
-            org: projects[i].querySelector(".org").value,
-            repo: projects[i].querySelector(".repo").value
-        });
+        if(projects[i].querySelector(".org").value !== "" || projects[i].querySelector(".repo").value !== ""){
+            projectStorageArr.push({
+                org: projects[i].querySelector(".org").value,
+                repo: projects[i].querySelector(".repo").value
+            });
+        }
     }
 
     chrome.storage.sync.set(
