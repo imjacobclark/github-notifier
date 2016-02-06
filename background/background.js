@@ -126,7 +126,7 @@ GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun, type)
             break;
     };
 
-	let notificationNodeList = container.querySelectorAll(selectors),
+    let notificationNodeList = container.querySelectorAll(selectors),
         notificationMetadataNodeList = container.querySelectorAll('.table-list-issues .js-issue-row  .tooltipped-s'),
         notificationReleaseMetadataNodeList = container.querySelectorAll('.release-timeline .release-authorship a');
 
