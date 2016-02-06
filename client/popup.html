@@ -1,63 +1,60 @@
 <html>
-	<head>
-		<title>GitHub Notifier</title>
+    <head>
+        <title>GitHub Notifier</title>
+        <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
+        <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-		<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.indigo-pink.min.css">
-		<script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <style>
+            .github-notifier.mdl-card {
+                width: 320px;
+                background: #f2ff;
+            }
 
-		<style>
-			.demo-card-square.mdl-card {
-				width: 320px;
-				background: #f2ff;
-			}
+            .github-notifier > .mdl-card__title {
+                color: #fff;
+                height: 170px;
+                background: url('https://enterprise.github.com/assets/aws/jetpack-octocat-airlock-b1d6ad7f41f88e5207896fe1f63ca30b.jpg') center / cover;
+            }
 
-			.demo-card-square > .mdl-card__title {
-			  color: #fff;
-			  height: 170px;
-			  background: url('https://enterprise.github.com/assets/aws/jetpack-octocat-airlock-b1d6ad7f41f88e5207896fe1f63ca30b.jpg') center / cover;
-			}
+            .github-notifier > .mdl-card__menu {
+                color: #fff;
+            }
 
-			.demo-card-square > .mdl-card__menu {
-			  color: #fff;
-			}
+            .add-project__forms{}
+        </style>
+    </head>
+    <body>
+        <div class="github-notifier mdl-card mdl-shadow--2d">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">GitHub Notifier</h2>
+            </div>
 
-			.add-project__forms{
+            <div class="mdl-card__supporting-text">
+                <p class="add-project__new-user">Hello, add a few projects to get started!</p>
+                <p class="add-project__been-here-before">Welcome back! Add a few more projects...</p>
+                <p>Enter the organisation/user and repo, <strong>not</strong> the full GitHub URL.</p>
 
-			}
-		</style>
-	</head>
-	<body>
-		<div class="demo-card-square mdl-card mdl-shadow--2d">
-			<div class="mdl-card__title">
-				<h2 class="mdl-card__title-text">GitHub Notifier</h2>
-			</div>
+                <div class="add-project__forms">
 
-			<div class="mdl-card__supporting-text">
-				<p class="add-project__new-user">Hello, add a few projects to get started!</p>
-				<p class="add-project__been-here-before">Welcome back! Add a few more projects...</p>
+                </div>
 
-				<div class="add-project__forms">
+                <br/>
 
-				</div>
+                <button class="add-project__watch-new-bttn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                Watch new project
+                </button>
 
-				<br/>
+                <button class="add-project__save-bttn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                Save
+                </button>
 
-				<button class="add-project__watch-new-bttn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-				  Watch new project
-				</button>
+                <br/><br/>
 
-				<button class="add-project__save-bttn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-				  Save
-				</button>
+                <p><a href="https://github.com/imjacobclark/github-notifier" target="_blank">Fork me on GitHub</a></p>
+            </div>
+        </div>
 
-				<br/><br/>
-
-				<p><a href="https://github.com/imjacobclark/github-notifier" target="_blank">Fork me on GitHub</a></p>
-
-			</div>
-		</div>
-
-		<script type="text/javascript" src="options.js"></script>
-	</body>
+        <script type="text/javascript" src="options.js"></script>
+    </body>
 </html>
