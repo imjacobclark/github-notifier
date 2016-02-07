@@ -19,9 +19,14 @@ function populateProjectList(){
                     <div class="add-project__form">\
                     <input type="text" value="' + project.org + '" placeholder="Organisation/User" class="org">\
                     <input type="text" value="' + project.repo + '" placeholder="Repo" class="repo">\
+                    <button class="mdl-button mdl-js-button mdl-button--icon" value="Delete">\
+                        <i class="delete material-icons">delete</i>\
+                    </button>\
                 </div>');
             }
         });
+        
+        attachDeleteEvents();
     });
 }
 
@@ -43,6 +48,36 @@ function saveProjects(){
             'data': projectStorageArr
         }
     );
+}
+
+function attachDeleteEvents(){
+    let projects = document.querySelectorAll('.delete');
+    
+    for (var i = 0; i < projects.length; ++i) {
+        projects[i].addEventListener("click", function(e){
+            let repo = e.target.parentNode.parentNode.querySelector('.repo').value,
+                org = e.target.parentNode.parentNode.querySelector('.org').value;
+            
+            chrome.storage.sync.get("data", function (obj) {
+                let projects = obj.data;
+                
+                for(var i = 0; i < projects.length; i++) {
+                    if(projects[i].repo === repo && projects[i].org == org) {
+                        projects.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                chrome.storage.sync.set(
+                    {
+                        'data': projects
+                    }
+                );
+                
+                e.target.parentNode.parentNode.remove();
+            });            
+        });
+    }
 }
 
 document.querySelector(".add-project__save-bttn").addEventListener("click", function(e){

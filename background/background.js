@@ -1,9 +1,25 @@
 "use strict";
 
-var GitHubNotifier = function(){
-    this.currentNotifications = [];
-    this.warmRepositories = [];
-}
+let warmRepositories = [],
+    currentNotifications = [];
+    
+chrome.notifications.onButtonClicked.addListener(
+    function(notifId, btnIdx) {
+        if (notifId === 'notloggedin') {
+            chrome.tabs.create(
+                {
+                    url: 'https://github.com/login'
+                }
+            );
+        } else {
+            chrome.tabs.create(
+                {
+                    url: 'http://github.com' + notifId.split(':')[3]
+                }
+            );
+        }
+    }
+);
 
 function XHRGetRequest(url){
     return new Promise(function(resolve, reject){
@@ -37,54 +53,36 @@ function displayNotification(id, title, message, buttons){
     );
 }
 
-chrome.notifications.onButtonClicked.addListener(
-    function(notifId, btnIdx) {
-        if (notifId === 'notloggedin') {
-            chrome.tabs.create(
-                {
-                    url: 'https://github.com/login'
-                }
-            );
-        } else if(notifId === '404'){
-
-        } else {
-            let notificationInformation = notifId.split(':');
-            
-            chrome.tabs.create(
-                {
-                    url: 'http://github.com' + notificationInformation[3]
-                }
-            );
-        }
-    }
-);
-
-GitHubNotifier.prototype.getData = function(initialRun){
+function getData(initialRun){
     chrome.storage.sync.get("data", (obj) => {
         obj.data.forEach((project) => {
-            let isCold = this.warmRepositories.indexOf(project.org + ":" + project.repo) === -1;
+            let organisation = project.org,
+                repository = project.repo,
+                githubProjectUrl = 'http://github.com/' + organisation + '/' + repository,
+                isCold = warmRepositories.indexOf(organisation + ":" + repository) === -1;
 
             if(isCold){
                 initialRun = true;
+                warmRepositories.push(organisation + ":" + repository);
             }
 
-            if(project.org !== undefined && project.repo !== undefined){
-                XHRGetRequest('http://github.com/' + project.org + '/' + project.repo + '/pulls').then((data) => {
-                    this.parseData(data, project.org, project.repo, initialRun, 'pull');
-                    return XHRGetRequest('http://github.com/' + project.org + '/' + project.repo + '/issues');
+            if(organisation !== undefined && repository !== undefined){
+                XHRGetRequest(githubProjectUrl + '/pulls').then((data) => {
+                    parseData(data, organisation, repository, initialRun, 'pull');
+                    return XHRGetRequest(githubProjectUrl + '/issues');
                 }).then((data) => {
-                    this.parseData(data, project.org, project.repo, initialRun, 'issue');
-                    return XHRGetRequest('http://github.com/' + project.org + '/' + project.repo + '/releases');
+                    parseData(data, organisation, repository, initialRun, 'issue');
+                    return XHRGetRequest(githubProjectUrl + '/releases');
                 }).then((data) => {
-                    this.parseData(data, project.org, project.repo, initialRun, 'release');
+                    parseData(data, organisation, repository, initialRun, 'release');
                 }).catch((e) => {
-                    if(e.status == 404){
+                    if (e.status == 404) {
                         displayNotification(
                             '404',
                             'GitHub Notifier - Error',
                             "Error: " + e.status + " " + e.statusText + "\nFor: " + e.responseURL + "\n\nPlease verify the organisation/user and repo are correct."
                         );
-                    }else{
+                    } else {
                         displayNotification(
                             'notloggedin',
                             'GitHub Notifier - Error',
@@ -95,33 +93,31 @@ GitHubNotifier.prototype.getData = function(initialRun){
                    
                 });
             };
-
-            if(isCold){
-                this.warmRepositories.push(project.org + ":" + project.repo);
-            }
         });
     });
 }
 
-GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun, type){
-    let container = document.implementation.createHTMLDocument().documentElement;
+function parseData(resp, org, repo, initialRun, type){
+    let container = document.implementation.createHTMLDocument().documentElement,
+        selectors;
+
     container.innerHTML = resp;
 
     switch(type){
         case 'pull':
-            var selectors = '.table-list-issues .js-issue-row .issue-title-link',
+            selectors = '.table-list-issues .js-issue-row .issue-title-link',
             type = 'pull request'
             break;
         case 'issue':
-            var selectors = '.table-list-issues .js-issue-row .issue-title-link',
+            selectors = '.table-list-issues .js-issue-row .issue-title-link',
             type = 'issue'
             break;
         case 'release':
-            var selectors = '.release-timeline .release-header .release-title a',
+            selectors = '.release-timeline .release-header .release-title a',
             type = 'release'
             break;
         default:
-            var selectors = '.table-list-issues .js-issue-row .issue-title-link',
+            selectors = '.table-list-issues .js-issue-row .issue-title-link',
             type = 'pull request'
             break;
     };
@@ -131,32 +127,31 @@ GitHubNotifier.prototype.parseData = function(resp, org, repo, initialRun, type)
         notificationReleaseMetadataNodeList = container.querySelectorAll('.release-timeline .release-authorship a');
 
     [].forEach.call(notificationNodeList, (notification, i) => {
-        if(this.currentNotifications.indexOf(notification.text.trim()) === -1){
+        if(currentNotifications.indexOf(notification.text.trim()) === -1){
             if(!initialRun){
-                if(type !== 'release'){
-                    var notificationAuthor = notificationMetadataNodeList[i].text.trim();
-                }else{
-                    var notificationAuthor = notificationReleaseMetadataNodeList[i].text.trim();
-                }
+                let notificationAuthor = notificationMetadataNodeList[i].text.trim(),
+                    notificationTitle = notification.text.trim(),
+                    notificationLink = notification.attributes['href'].value;
 
-                let notificationTitle = notification.text.trim(),
-                    notificationLink = notification.attributes['href'].value,
-                    message = notificationTitle + '\n\nAuthor: ' + notificationAuthor;
+                if (type === 'release') {
+                    notificationAuthor = notificationReleaseMetadataNodeList[i].text.trim(); 
+                }
 
                 displayNotification(
                     org + ':' + repo  + ':' + notificationTitle.replace(':', '') + ':' + notificationLink,
                     org + '/' + repo + " - " + type,
-                    message,
+                    notificationTitle + '\n\nAuthor: ' + notificationAuthor,
                     [{ title: "View " + type }]
                 );
             }
 
-            this.currentNotifications.push(notification.text.trim());
+            currentNotifications.push(notification.text.trim());
         };
     });
 }
 
-var ghprn = new GitHubNotifier();
-ghprn.getData(true);
+// Initial run to prevent notification flooding
+getData(true);
 
-setInterval(() => ghprn.getData(false), 5000);
+// Poll for new notifications every 5 seconds
+setInterval(() => getData(false), 5000);
