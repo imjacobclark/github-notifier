@@ -28,6 +28,10 @@ function populateProjectList(){
         
         attachDeleteEvents();
     });
+    
+    chrome.storage.sync.get("refresh", function (obj) {
+       document.querySelector('.refresh-interval').value = obj.refresh / 1000.0;
+    });
 }
 
 function saveProjects(){
@@ -45,7 +49,8 @@ function saveProjects(){
 
     chrome.storage.sync.set(
         {
-            'data': projectStorageArr
+            'data': projectStorageArr,
+            'refresh': parseInt(document.querySelector('.refresh-interval').value) * 1000.0
         }
     );
 }
@@ -99,4 +104,16 @@ document.querySelector('.add-project__watch-new-bttn').addEventListener("click",
     e.preventDefault();
 });
 
-populateProjectList();
+chrome.storage.sync.get("refresh", function (obj) {
+    if(obj.refresh === undefined){
+        chrome.storage.sync.set(
+            {
+                'refresh': 5000
+            }
+        );
+        
+        document.querySelector('.refresh-interval').value = 5;
+    }
+    
+    populateProjectList();
+});

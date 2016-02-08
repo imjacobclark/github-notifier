@@ -153,5 +153,7 @@ function parseData(resp, org, repo, initialRun, type){
 // Initial run to prevent notification flooding
 getData(true);
 
-// Poll for new notifications every 5 seconds
-setInterval(() => getData(false), 5000);
+// Poll for new notifications every x seconds
+chrome.storage.sync.get("refresh", (obj) => {
+    setInterval(() => getData(false), obj.refresh);
+});
