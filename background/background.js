@@ -1,7 +1,10 @@
 "use strict";
 
 let warmRepositories = [],
-    currentNotifications = [];
+    currentNotifications = [],
+    circuitBreaker = false,
+    intervalID,
+    currentRefresh;
     
 chrome.notifications.onButtonClicked.addListener(
     function(notifId, btnIdx) {
@@ -76,19 +79,23 @@ function getData(initialRun){
                 }).then((data) => {
                     parseData(data, organisation, repository, initialRun, 'release');
                 }).catch((e) => {
-                    if (e.status == 404) {
-                        displayNotification(
-                            '404',
-                            'GitHub Notifier - Error',
-                            "Error: " + e.status + " " + e.statusText + "\nFor: " + e.responseURL + "\n\nPlease verify the organisation/user and repo are correct."
-                        );
-                    } else {
-                        displayNotification(
-                            'notloggedin',
-                            'GitHub Notifier - Error',
-                            "You don't appear signed into GitHub! \n\n",
-                            [{ title: "Sign in" }]
-                        );
+                    if(!circuitBreaker){
+                        if (e.status == 404) {
+                            displayNotification(
+                                '404',
+                                'GitHub Notifier - Error',
+                                "Error: " + e.status + " " + e.statusText + "\nFor: " + e.responseURL + "\n\nPlease verify the organisation/user and repo are correct."
+                            );
+                        } else {
+                            displayNotification(
+                                'notloggedin',
+                                'GitHub Notifier - Error',
+                                "You don't appear signed into GitHub! \n\n",
+                                [{ title: "Sign in" }]
+                            );
+                        }
+                        
+                        circuitBreaker = true;
                     }
                    
                 });
@@ -100,6 +107,8 @@ function getData(initialRun){
 function parseData(resp, org, repo, initialRun, type){
     let container = document.implementation.createHTMLDocument().documentElement,
         selectors;
+        
+    circuitBreaker = false;
 
     container.innerHTML = resp;
 
@@ -148,6 +157,14 @@ function parseData(resp, org, repo, initialRun, type){
             currentNotifications.push(notification.text.trim());
         };
     });
+    
+    chrome.storage.sync.get("refresh", (obj) => {
+        if(currentRefresh !== obj.refresh){
+            clearInterval(intervalID);
+            currentRefresh = obj.refresh;
+            intervalID = setInterval(() => getData(false), currentRefresh);
+        }
+    });
 }
 
 // Initial run to prevent notification flooding
@@ -155,5 +172,6 @@ getData(true);
 
 // Poll for new notifications every x seconds
 chrome.storage.sync.get("refresh", (obj) => {
-    setInterval(() => getData(false), obj.refresh);
+    currentRefresh = obj.refresh;
+    intervalID = setInterval(() => getData(false), currentRefresh);
 });
