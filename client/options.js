@@ -108,11 +108,11 @@ chrome.storage.sync.get("refresh", function (obj) {
     if(obj.refresh === undefined){
         chrome.storage.sync.set(
             {
-                'refresh': 5000
+                'refresh': 60000
             }
         );
         
-        document.querySelector('.refresh-interval').value = 5;
+        document.querySelector('.refresh-interval').value = 60;
     }
     
     populateProjectList();

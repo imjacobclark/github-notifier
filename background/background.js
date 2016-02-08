@@ -2,16 +2,15 @@
 
 let warmRepositories = [],
     currentNotifications = [],
-    circuitBreaker = false,
     intervalID,
     currentRefresh;
     
 chrome.notifications.onButtonClicked.addListener(
     function(notifId, btnIdx) {
-        if (notifId === 'notloggedin') {
+        if (notifId === 'github') {
             chrome.tabs.create(
                 {
-                    url: 'https://github.com/login'
+                    url: 'https://github.com/'
                 }
             );
         } else {
@@ -79,25 +78,12 @@ function getData(initialRun){
                 }).then((data) => {
                     parseData(data, organisation, repository, initialRun, 'release');
                 }).catch((e) => {
-                    if(!circuitBreaker){
-                        if (e.status == 404) {
-                            displayNotification(
-                                '404',
-                                'GitHub Notifier - Error',
-                                "Error: " + e.status + " " + e.statusText + "\nFor: " + e.responseURL + "\n\nPlease verify the organisation/user and repo are correct."
-                            );
-                        } else {
-                            displayNotification(
-                                'notloggedin',
-                                'GitHub Notifier - Error',
-                                "You don't appear signed into GitHub! \n\n",
-                                [{ title: "Sign in" }]
-                            );
-                        }
-                        
-                        circuitBreaker = true;
-                    }
-                   
+                    displayNotification(
+                        'github',
+                        'GitHub Notifier - Error',
+                        "There was an issue talking to GitHub, ensure your settings are correct, you're logged in and your watched projects exsist.",
+                        [{title: "Open GitHub"}]
+                    );
                 });
             };
         });
@@ -107,8 +93,6 @@ function getData(initialRun){
 function parseData(resp, org, repo, initialRun, type){
     let container = document.implementation.createHTMLDocument().documentElement,
         selectors;
-        
-    circuitBreaker = false;
 
     container.innerHTML = resp;
 
@@ -172,6 +156,10 @@ getData(true);
 
 // Poll for new notifications every x seconds
 chrome.storage.sync.get("refresh", (obj) => {
+    if(obj.refresh === undefined){
+        obj.refresh = 60000;
+    }
+    
     currentRefresh = obj.refresh;
     intervalID = setInterval(() => getData(false), currentRefresh);
 });
