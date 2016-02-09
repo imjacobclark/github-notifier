@@ -18,11 +18,11 @@ chrome.notifications.onButtonClicked.addListener(
 function XHRGetRequest(url){
     return new Promise(function(resolve, reject){
         let request = new XMLHttpRequest();
-        
-        // Set GitHub user agent (good web citizen)
-        request.setRequestHeader('X-GH-UserAgent', 'github-notifier-v1.11');
-        
+
         request.open('GET', url, true);
+
+        // Set GitHub user agent (good web citizen)
+        request.setRequestHeader('X-GH-UserAgent', 'github-notifier-v1.11.1');
 
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
@@ -135,7 +135,13 @@ function parseData(resp, org, repo, initialRun, type){
     chrome.storage.sync.get("refresh", (obj) => {
         if(currentRefresh !== obj.refresh){
             clearInterval(intervalID);
+            
+            if(obj.refresh <= 180000){
+                obj.refresh = 180000;
+            };
+
             currentRefresh = obj.refresh;
+
             intervalID = setInterval(() => getData(false), currentRefresh);
         }
     });
