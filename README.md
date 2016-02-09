@@ -12,7 +12,6 @@ https://chrome.google.com/webstore/detail/github-notifier/ekjiicgclcmjodoijejldo
 - Ability to open pull/issue/release straight from the notification
 - Ability to see who raised a pull request/issue/release
 - Ability to set refresh rate
-- Notifications if you're not logged into GitHub
 - Ability to watch multiple GitHub projects
 - No requirement for API/Secret Tokens
 - Open Source under MIT licence

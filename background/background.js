@@ -7,19 +7,11 @@ let warmRepositories = [],
     
 chrome.notifications.onButtonClicked.addListener(
     function(notifId, btnIdx) {
-        if (notifId === 'github') {
-            chrome.tabs.create(
-                {
-                    url: 'https://github.com/'
-                }
-            );
-        } else {
-            chrome.tabs.create(
-                {
-                    url: 'http://github.com' + notifId.split(':')[3]
-                }
-            );
-        }
+        chrome.tabs.create(
+            {
+                url: 'http://github.com' + notifId.split(':')[3]
+            }
+        );
     }
 );
 
@@ -78,12 +70,7 @@ function getData(initialRun){
                 }).then((data) => {
                     parseData(data, organisation, repository, initialRun, 'release');
                 }).catch((e) => {
-                    displayNotification(
-                        'github',
-                        'GitHub Notifier - Error',
-                        "There was an issue talking to GitHub, ensure your settings are correct, you're logged in and your watched projects exsist.",
-                        [{title: "Open GitHub"}]
-                    );
+                    console.error('There was an issue fetching ' + e.responseURL + ' from Github. Error: ', e);
                 });
             };
         });
