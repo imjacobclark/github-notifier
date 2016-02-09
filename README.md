@@ -5,6 +5,7 @@ Chrome notifications for GitHub.
 https://chrome.google.com/webstore/detail/github-notifier/ekjiicgclcmjodoijejldoohdlomjlhl
 
 ### Features
+- Supports public and private repositories 
 - Desktop notifications when a new pull request is raised
 - Desktop notifications when a new issue is raised
 - Desktop notifications when a new release is cut
