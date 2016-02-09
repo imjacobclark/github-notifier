@@ -35,6 +35,8 @@
                 <p class="add-project__been-here-before">Welcome back! Add a few more projects...</p>
                 <p>Enter the organisation/user and repo, <strong>not</strong> the full GitHub URL.</p>
 
+                <div class="error-save" style="color: red"></div>
+
                 <div class="add-project__forms">
 
                 </div>
@@ -42,7 +44,7 @@
                 <hr/>
                 
                 <label for="interval">Refresh every </label>
-                <input type="text" name="interval" class="refresh-interval" value="60" style="width:50px;"></input> seconds
+                <input type="text" name="interval" class="refresh-interval" value="180" min="180" style="width:50px;"></input> seconds
                 
                 <br/><br/>
 

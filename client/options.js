@@ -46,13 +46,19 @@ function saveProjects(){
             });
         }
     }
-
-    chrome.storage.sync.set(
-        {
-            'data': projectStorageArr,
-            'refresh': parseInt(document.querySelector('.refresh-interval').value) * 1000.0
-        }
-    );
+    
+    if (document.querySelector('.refresh-interval').value >= 180) {
+        document.querySelector('.error-save').style.display = 'none';
+        chrome.storage.sync.set(
+            {
+                'data': projectStorageArr,
+                'refresh': parseInt(document.querySelector('.refresh-interval').value) * 1000.0
+            }
+        );
+    } else {
+        document.querySelector('.error-save').style.display = 'block';
+        document.querySelector('.error-save').innerText = "Interval not saved, must be more than 180 seconds.";
+    }
 }
 
 function attachDeleteEvents(){
@@ -108,11 +114,11 @@ chrome.storage.sync.get("refresh", function (obj) {
     if(obj.refresh === undefined){
         chrome.storage.sync.set(
             {
-                'refresh': 60000
+                'refresh': 180000
             }
         );
         
-        document.querySelector('.refresh-interval').value = 60;
+        document.querySelector('.refresh-interval').value = 180;
     }
     
     populateProjectList();

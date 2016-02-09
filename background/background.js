@@ -18,7 +18,10 @@ chrome.notifications.onButtonClicked.addListener(
 function XHRGetRequest(url){
     return new Promise(function(resolve, reject){
         let request = new XMLHttpRequest();
-
+        
+        // Set GitHub user agent (good web citizen)
+        request.setRequestHeader('X-GH-UserAgent', 'github-notifier-v1.11');
+        
         request.open('GET', url, true);
 
         request.onload = function() {
@@ -143,8 +146,8 @@ getData(true);
 
 // Poll for new notifications every x seconds
 chrome.storage.sync.get("refresh", (obj) => {
-    if(obj.refresh === undefined){
-        obj.refresh = 60000;
+    if(obj.refresh === undefined || obj.refresh <= 180000){
+        obj.refresh = 180000;
     }
     
     currentRefresh = obj.refresh;
