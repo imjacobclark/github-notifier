@@ -22,7 +22,7 @@ function XHRGetRequest(url){
         request.open('GET', url, true);
 
         // Set GitHub user agent (good web citizen)
-        request.setRequestHeader('X-GH-UserAgent', 'github-notifier-v1.11.1');
+        request.setRequestHeader('X-GH-UserAgent', 'github-notifier-v1.11.2');
 
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
