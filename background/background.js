@@ -53,29 +53,31 @@ function displayNotification(id, title, message, buttons){
 function getData(initialRun){
     chrome.storage.sync.get("data", (obj) => {
         obj.data.forEach((project) => {
-            let organisation = project.org,
-                repository = project.repo,
-                githubProjectUrl = 'http://github.com/' + organisation + '/' + repository,
-                isCold = warmRepositories.indexOf(organisation + ":" + repository) === -1;
+            setTimeout(function () {
+                let organisation = project.org,
+                    repository = project.repo,
+                    githubProjectUrl = 'http://github.com/' + organisation + '/' + repository,
+                    isCold = warmRepositories.indexOf(organisation + ":" + repository) === -1;
 
-            if(isCold){
-                initialRun = true;
-                warmRepositories.push(organisation + ":" + repository);
-            }
+                if(isCold){
+                    initialRun = true;
+                    warmRepositories.push(organisation + ":" + repository);
+                }
 
-            if(organisation !== undefined && repository !== undefined){
-                XHRGetRequest(githubProjectUrl + '/pulls').then((data) => {
-                    parseData(data, organisation, repository, initialRun, 'pull');
-                    return XHRGetRequest(githubProjectUrl + '/issues');
-                }).then((data) => {
-                    parseData(data, organisation, repository, initialRun, 'issue');
-                    return XHRGetRequest(githubProjectUrl + '/releases');
-                }).then((data) => {
-                    parseData(data, organisation, repository, initialRun, 'release');
-                }).catch((e) => {
-                    console.error('There was an issue fetching ' + e.responseURL + ' from Github. Error: ', e);
-                });
-            };
+                if(organisation !== undefined && repository !== undefined){
+                    XHRGetRequest(githubProjectUrl + '/pulls').then((data) => {
+                        parseData(data, organisation, repository, initialRun, 'pull');
+                        return XHRGetRequest(githubProjectUrl + '/issues');
+                    }).then((data) => {
+                        parseData(data, organisation, repository, initialRun, 'issue');
+                        return XHRGetRequest(githubProjectUrl + '/releases');
+                    }).then((data) => {
+                        parseData(data, organisation, repository, initialRun, 'release');
+                    }).catch((e) => {
+                        console.error('There was an issue fetching ' + e.responseURL + ' from Github. Error: ', e);
+                    });
+                };
+            }, 60000)
         });
     });
 }
